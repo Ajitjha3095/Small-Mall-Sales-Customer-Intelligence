@@ -622,4 +622,4 @@ If you find the analytical approach useful, feel free to explore the repository 
 ## License
 
 This project is licensed under the **MIT License**.  
-See the [LICENSE](LICENSE) file for details.7
+See the [LICENSE](LICENSE) file for details.
