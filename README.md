@@ -618,3 +618,8 @@ If you find the analytical approach useful, feel free to explore the repository 
 - GitHub and Kaggle portfolio publishing
 
 ---
+
+## License
+
+This project is licensed under the **MIT License**.  
+See the [LICENSE](LICENSE) file for details.7
