@@ -1,0 +1,56 @@
+// 1. Find Most Active Customers (Top 10 by purchases)
+MATCH (c:Customer)-[:PURCHASED]->(s:Shop)
+RETURN c.name AS Customer, count(s) AS PurchaseCount
+ORDER BY PurchaseCount DESC 
+LIMIT 10;
+
+// 2. Find Shops with Highest Sales Volume
+MATCH (c:Customer)-[:PURCHASED]->(s:Shop)
+RETURN s.name AS ShopName, count(c) AS TotalTransactions
+ORDER BY TotalTransactions DESC;
+
+// 3. Customer Recommendations (Shops frequented by similar customers)
+MATCH (c1:Customer {Customer_ID: $customer_id})-[:PURCHASED]->(s:Shop)<-[:PURCHASED]-(c2:Customer)
+MATCH (c2)-[:PURCHASED]->(rec:Shop)
+WHERE NOT (c1)-[:PURCHASED]->(rec)
+RETURN rec.name AS RecommendedShop, count(*) AS RecommendationStrength
+ORDER BY RecommendationStrength DESC;
+
+// 4. Count Isolated Customers (Customers who haven't made any purchases)
+MATCH (c:Customer)
+WHERE NOT (c)-[:PURCHASED]->(:Shop)
+RETURN count(c) AS InactiveCustomers;
+
+// 5. Identify Customer-to-Shop Clusters (Find dense shopping communities)
+MATCH (c:Customer)-[:PURCHASED]->(s:Shop)
+RETURN s.name AS Shop, collect(distinct c.name) AS CustomerList, count(c) AS GroupSize
+ORDER BY GroupSize DESC;
+
+// 6. Find Churn Risks (Customers connected to only one shop)
+MATCH (c:Customer)-[:PURCHASED]->(s:Shop)
+WITH c, count(s) AS ShopCount
+WHERE ShopCount = 1
+RETURN c.name AS CustomerName, c.Customer_ID AS ID;
+
+// 7. Get Average Purchases Per Customer
+MATCH (c:Customer)
+OPTIONAL MATCH (c)-[:PURCHASED]->(s:Shop)
+WITH c, count(s) AS TotalPurchases
+RETURN avg(TotalPurchases) AS AveragePurchasesPerCustomer;
+
+// 8. Find Shops Sharing the Same Customers
+MATCH (s1:Shop)<-[:PURCHASED]-(c:Customer)-[:PURCHASED]->(s2:Shop)
+WHERE id(s1) < id(s2)
+RETURN s1.name AS ShopA, s2.name AS ShopB, count(c) AS SharedCustomers
+ORDER BY SharedCustomers DESC;
+
+// 9. Find Long-Tail Shops (Shops with fewer than 3 unique buyers)
+MATCH (c:Customer)-[:PURCHASED]->(s:Shop)
+WITH s, count(DISTINCT c) AS UniqueBuyers
+WHERE UniqueBuyers < 3
+RETURN s.name AS NicheShop, UniqueBuyers;
+
+// 10. Sample Random Walk for Path Discovery
+MATCH path = (c:Customer)-[:PURCHASED]->(s:Shop)
+RETURN path
+LIMIT 25;
